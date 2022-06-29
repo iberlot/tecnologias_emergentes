@@ -1,0 +1,95 @@
+# Use root/mysql as user/password credentials
+
+version: '3.8'
+
+services:
+
+    db:
+        image: mysql
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: te_pilar_grp_1
+            MYSQL_USER: usuario
+            MYSQL_PASSWORD: 1234
+        volumes:
+            - ./data/db:/var/lib/mysql
+        ports:
+            - "33306:3306"
+        networks:
+            red_interna:
+                ipv4_address: 192.168.20.10
+        hostname: data_base_server
+        # container_name: data_base_server
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+        networks:
+            red_web:
+                ipv4_address: 192.168.10.20
+            red_interna:
+                ipv4_address: 192.168.20.20
+        hostname: adminer
+
+    mosquito:
+        image: eclipse-mosquitto
+        restart: always
+        volumes:
+          - .\datos_mosquito:/mosquitto
+        ports:
+            - 1883:1883
+            - 9001:9001
+        networks:
+            red_web:
+                ipv4_address: 192.168.10.50
+            red_interna:
+                ipv4_address: 192.168.20.50
+        hostname: mosquito
+
+    mosquito_explorer:
+        image: ccll/mqtt-explorer
+        restart: always
+        volumes:
+          - .\datos_mosquito:/home/node
+        ports:
+            - 4000:4000
+            - 5900:5900
+        networks:
+            red_web:
+                ipv4_address: 192.168.10.40
+            red_interna:
+                ipv4_address: 192.168.20.40
+        hostname: mosquito_explorer
+
+    api_docker:
+        build:
+            context: ./
+            dockerfile: Dockerfile-api
+        image: api_image
+        restart: always
+        depends_on:
+            - db
+        volumes:
+          - .\app:/code/app
+        ports:
+            - 80:80
+        networks:
+            red_web:
+                ipv4_address: 192.168.10.30
+            red_interna:
+                ipv4_address: 192.168.20.30
+        hostname: api_server
+
+networks:
+    red_web:
+        ipam:
+            config:
+              - subnet: 192.168.10.0/24
+    red_interna:
+        ipam:
+            config:
+              - subnet: 192.168.20.0/24
