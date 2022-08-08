@@ -8,10 +8,12 @@ from sqlalchemy.orm import Session
 # from . import crud, models, schemas
 from . import models, schemas
 from .database import SessionLocal, engine
+import random
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
 
 # Dependency
 def get_db():
@@ -24,7 +26,7 @@ def get_db():
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+   return {"Hello": "World"}
 
 @app.post("/locations/{name}/{lat}/{lon}", response_model=schemas.Location)
 def add_location(datos: schemas.Location, db: Session = Depends(get_db)):
@@ -35,13 +37,18 @@ def add_location(datos: schemas.Location, db: Session = Depends(get_db)):
     return location
 
 
-@app.post("/temp/{temp}/{humidity}/{id_loc}", response_model=schemas.Temp)
+@app.post("/temp/{temp}/{humidity}/{location_id}", response_model=schemas.Temp)
 def add_temp_humidity(datos: schemas.Temp, db: Session = Depends(get_db)):
-    temperatura = models.Temp(temp = datos.temp, humidity = datos.humidity, location_id = datos.id_loc)
+    print("add temp")
+    temperatura = models.Temp(id = random.randint(0, 10000000), temp = datos.temp, humidity = datos.humidity, location_id = datos.location_id)
     db.add(temperatura)
     db.commit()
     db.refresh(temperatura)
     return temperatura
+
+
+
+
 
 @app.get("/locations")
 def max_temp(db: Session = Depends(get_db)):

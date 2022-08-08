@@ -50,21 +50,6 @@ services:
                 ipv4_address: 192.168.20.50
         hostname: mosquito
 
-    mosquito_explorer:
-        image: ccll/mqtt-explorer
-        restart: always
-        volumes:
-          - .\datos_mosquito:/home/node
-        ports:
-            - 4000:4000
-            - 5900:5900
-        networks:
-            red_web:
-                ipv4_address: 192.168.10.40
-            red_interna:
-                ipv4_address: 192.168.20.40
-        hostname: mosquito_explorer
-
     api_docker:
         build:
             context: ./
@@ -83,6 +68,24 @@ services:
             red_interna:
                 ipv4_address: 192.168.20.30
         hostname: api_server
+
+    api_listen:
+        build:
+            context: ./
+            dockerfile: Dockerfile-api_listen
+        image: api_listen_image
+        restart: always
+        depends_on:
+            - db
+        volumes:
+          - .\app:/code/app_listen
+        networks:
+            red_web:
+                ipv4_address: 192.168.10.40
+            red_interna:
+                ipv4_address: 192.168.20.40
+        hostname: api_listen_server
+
 
 networks:
     red_web:

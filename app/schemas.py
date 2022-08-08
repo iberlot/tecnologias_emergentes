@@ -21,12 +21,14 @@ class Location(LocationBase):
 class TempBase(BaseModel):
     temp: int
     humidity: int
+    id: int
 
 class TempCreate(TempBase):
     pass
 
 class Temp(TempBase):
-    id: int
+    # id: int
+    location_id: int
 
     class Config:
         orm_mode = True
