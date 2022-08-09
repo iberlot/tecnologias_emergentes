@@ -3,20 +3,11 @@ import paho.mqtt.client as mqtt
 import time
 import httpx
 import asyncio
+import json
+import mysql.connector
 from queue import Queue
 
 queueData = Queue()
-
-# def on_message(client, userdata, message):
-# 	datos = str(message.payload.decode("utf-8"))
-# 	datosConv = datos.split('#')
-# 	data = {"temperatura": float(datosConv[0]), "humedad": float(datosConv[1]), "ubicacion": str(datosConv[2])}
-# 	queueData.put(data)
-# 	print("Mensaje recibido: ", datos)
-
-# def on_connect(client, userdata, flags, rc):
-# 	print("Conectado, codigo: " + str(rc))
-# 	client.subscribe("Registros")
 
 async def add(data):
 	async with httpx.AsyncClient() as client:
@@ -36,8 +27,24 @@ def on_log(client, userdata, level, buf):
 
 ############
 def on_message(client, userdata, message):
-	print("message received " ,str(message.payload.decode("utf-8")))
-	
+	# print("message received " ,str(message.payload.decode("utf-8")))
+	#archivo-salida.py
+
+	json_object = json.loads(str(message.payload.decode("utf-8")))
+
+	conexion1=mysql.connector.connect(host="tecnologias_emergentes_db_1", port="3306", user="usuario", passwd="1234", database="te_pilar_grp_1")
+	cursor1=conexion1.cursor()
+	sql="INSERT INTO temp (temp, humidity, location_id) VALUES (%s,%s,%s)"
+	datos=(json_object["temp"], json_object["humidity"], json_object["location_id"])
+	cursor1.execute(sql, datos)
+	conexion1.commit()
+	conexion1.close()  
+
+ 
+	f = open ('log.txt','a')
+	f.write(sql)
+	f.write("\n")
+	f.close()
 	
     # print("message topic=",message.topic)
     # print("message qos=",message.qos)
@@ -52,7 +59,7 @@ async def test():
 	client.connect(broker_address)
 	client.loop_start()
 	client.subscribe("clima")
-	client.publish("clima","OxFxF")
+	# client.publish("clima","OFF")
 	time.sleep(4) # wait
 	client.loop_stop()
     

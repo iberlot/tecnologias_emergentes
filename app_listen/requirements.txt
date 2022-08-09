@@ -1,3 +1,4 @@
 paho-mqtt
 httpx
 asyncio
+mysql-connector-python
