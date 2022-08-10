@@ -22,6 +22,10 @@ class Temp(Base):
     __tablename__ = "temp"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    ano = Column(Integer)
+    mes = Column(Integer)
+    dia = Column(Integer)
+    hora = Column(Integer)
     temp = Column(Integer)
     humidity = Column(Integer)
     location_id = Column(Integer, ForeignKey(Location.id))

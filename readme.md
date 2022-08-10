@@ -46,3 +46,39 @@ Acceder por consola
 docker ps
 docker exec -i -t d83c525a65b3  /bin/bash
 ```
+
+## Uso de Mosquito MQTT
+
+en la consola del contenedor para suscribirse al topic:
+
+```shell
+mosquitto_sub -h localhost -t clima
+```
+
+para publicar los datos:
+
+```shell
+ mosquitto_pub -h localhost -t clima -m '{"ano": "2022","mes": "08","dia": "09","hora": "13","temp": "12", "humidity": "85", "location_id": "1"}'
+```
+
+### Consideraciones a tener en cuenta
+
+En el codigo del arduino hay definidas un conjuntos de variables que hay que definir para asegurarse que funcione todo.
+
+Nombre de la red a la que se conectara:
+
+```shell
+const char* ssid = "xxxxxxxx";
+```
+
+Contraseña de la red:
+
+```shell
+const char* password = "xxxxxxxxxxx";
+```
+
+Servidor MQTT:
+
+```shell
+const char* mqtt_server = "XXXXXXXXXXXX";
+```

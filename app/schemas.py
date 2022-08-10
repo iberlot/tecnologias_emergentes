@@ -22,6 +22,10 @@ class TempBase(BaseModel):
     temp: int
     humidity: int
     id: int
+    ano: int
+    mes: int
+    dia: int
+    hora: int
 
 class TempCreate(TempBase):
     pass
